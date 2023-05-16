@@ -1,5 +1,6 @@
 package po_java;
 
+import javax.swing.*;
 import java.util.Random;
 
 public abstract class Organism {
@@ -14,12 +15,16 @@ public abstract class Organism {
     protected Pair<Integer, Integer> pos;
 
     public Organism(World world) {
-
+        this.world = world;
+        this.strength = 0;
+        this.age = 0;
+        this.initiative = 0;
+        pos = new Pair<>(0, 0);
     }
 
     public abstract void update();
     public abstract void handleCollision(Organism other);
-    public abstract void draw();
+    public abstract void draw(JButton tileButton);
 
     public boolean bounceAttack(Organism organism) { return false; };
     public boolean escaped() { return false; };
@@ -76,23 +81,51 @@ public abstract class Organism {
     }
 
     public void setPos(Pair<Integer, Integer> newPos) {
-
+        pos = newPos;
     }
 
     public int getStrength() {
         return strength;
     }
-    int getInitiative() {
+    public int getInitiative() {
         return initiative;
     }
-    int getAge() {
+    public int getAge() {
         return age;
     }
-    Pair<Integer, Integer> getPos() {
+    public Pair<Integer, Integer> getPos() {
         return pos;
     }
 
-    Pair<Integer, Integer> findFreeSpace(Pair<Integer, Integer> startPos) {
-        return new Pair<>(-1, -1);
+    public Pair<Integer, Integer> findFreeSpace(Pair<Integer, Integer> startPos) {
+        Pair<Integer, Integer>[] directions = new Pair[] {
+                new Pair<>(1, 0),
+                new Pair<>(-1, 0),
+                new Pair<>(0, 1),
+                new Pair<>(0, -1)
+        };
+
+        Pair<Integer, Integer> freePos = new Pair<>(-1, -1);
+
+        for (Pair<Integer, Integer> dir : directions) {
+            Pair<Integer, Integer> afterPos = new Pair<>(
+                    startPos.first + dir.first,
+                    startPos.second + dir.second
+            );
+
+            if (afterPos.first >= world.board[0].length ||
+                    afterPos.first < 0 || afterPos.second < 0 ||
+                    afterPos.second >= world.board.length) {
+                continue;
+            }
+
+            Organism space = world.board[afterPos.second][afterPos.first];
+            if (space == null) {
+                freePos = new Pair<>(afterPos.first, afterPos.second);
+                break;
+            }
+        }
+
+        return freePos;
     }
 }
