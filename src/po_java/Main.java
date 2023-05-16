@@ -8,9 +8,9 @@ import java.awt.event.ActionListener;
 public class Main {
     public static void main(String[] args) {
         JFrame window = new JFrame("Virtual World Simulator");
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setLayout(new GridBagLayout());
-        window.setSize(800, 800);
+        window.setSize(400, 300);
 
         GridBagConstraints constraints = new GridBagConstraints();
 
@@ -19,7 +19,7 @@ public class Main {
         constraints.gridy = 0;
         window.add(labelX, constraints);
 
-        JTextField inputSizeX = new JTextField("19");
+        JTextField inputSizeX = new JTextField("20");
         constraints.gridx = 0;
         constraints.gridy = 1;
         inputSizeX.setPreferredSize(new Dimension(50, 30));
@@ -30,7 +30,7 @@ public class Main {
         constraints.gridy = 0;
         window.add(labelY, constraints);
 
-        JTextField inputSizeY = new JTextField("19");
+        JTextField inputSizeY = new JTextField("20");
         constraints.gridx = 1;
         constraints.gridy = 1;
         inputSizeY.setPreferredSize(new Dimension(50, 30));
@@ -40,7 +40,12 @@ public class Main {
         enterButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                int sizeX = Integer.parseInt(inputSizeX.getText());
+                int sizeY = Integer.parseInt(inputSizeY.getText());
 
+                window.dispose();
+
+                new World(sizeX, sizeY);
             }
         });
         constraints.gridx = 0;

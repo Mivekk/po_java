@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="po_java" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="po_java.Main" />
+    <module name="po_java" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
