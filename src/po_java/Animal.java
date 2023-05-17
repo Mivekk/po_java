@@ -103,10 +103,14 @@ public abstract class Animal extends Organism {
     }
 
     private void fight(Organism organism) {
-        if (strength >= organism.getStrength()) {
+        if (organism.bounceAttack(this)) {
+            world.logs.add(organism.getType() + " bounces attack from " + getType());
+        }
+        else if (strength >= organism.getStrength()) {
             Pair<Integer, Integer> afterPos = new Pair<>(organism.getPos().first, organism.getPos().second);
 
             if (organism.escaped()) {
+                world.logs.add(organism.getType() + " escaped from " + getType() + " at X: " + pos.first + " Y: " + pos.second);
                 move(afterPos);
                 return;
             }

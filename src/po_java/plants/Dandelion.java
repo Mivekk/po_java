@@ -35,6 +35,7 @@ public class Dandelion extends Plant {
 
                     Dandelion newPlant = new Dandelion(world, newPos);
 
+                    world.logs.add("Dandelion grew at X: " + newPos.second + " Y: " + newPos.first);
                     world.addOrganism(newPlant);
 
                     newPlant.didRegrow = true;

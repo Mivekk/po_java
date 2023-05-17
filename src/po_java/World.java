@@ -157,6 +157,8 @@ public class World {
 
         initLogs();
 
+        drawLegend();
+
         draw();
 
         handleInput();
@@ -330,11 +332,36 @@ public class World {
 
 
     private void drawLegend() {
+        JPanel legendPanel = new JPanel();
+        GridLayout gridLayout = new GridLayout(5, 2);
+        gridLayout.setHgap(10);
+        gridLayout.setVgap(10);
+        legendPanel.setLayout(gridLayout);
+        legendPanel.setBounds(0, 700, 300, 200);
 
+        drawLegendHelper(new Color(31, 244, 255), "Antelope", legendPanel);
+        drawLegendHelper(new Color(255, 165, 31), "Fox", legendPanel);
+        drawLegendHelper(Color.BLACK, "Human", legendPanel);
+        drawLegendHelper(new Color(209, 209, 209), "Sheep", legendPanel);
+        drawLegendHelper(new Color(59, 150, 32), "Turtle", legendPanel);
+        drawLegendHelper(new Color(130, 126, 126), "Wolf", legendPanel);
+        drawLegendHelper(new Color(66, 135, 245), "Belladonna", legendPanel);
+        drawLegendHelper(Color.YELLOW, "Dandelion", legendPanel);
+        drawLegendHelper(new Color(138, 222, 100), "Grass", legendPanel);
+        drawLegendHelper(Color.MAGENTA, "Sosnowsky", legendPanel);
+
+        window.add(legendPanel);
     }
 
-    private void drawLegendHelper() {
+    private void drawLegendHelper(Color color, String text, JPanel legendPanel) {
+        JButton displayColor = new JButton();
+        displayColor.setFocusable(false);
+        displayColor.setBackground(color);
+        legendPanel.add(displayColor);
 
+        JTextArea legendTextArea = new JTextArea(text);
+        legendTextArea.setFont(new Font("Arial", Font.PLAIN, 18));
+        legendPanel.add(legendTextArea);
     }
 
     private void save() {
