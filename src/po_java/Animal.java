@@ -78,14 +78,19 @@ public abstract class Animal extends Organism {
             Animal newAnimal = null;
 
             if (this instanceof Wolf) {
+                world.logs.add("Wolf spawned at X: " + newPos.second + " Y: " + newPos.first);
                 newAnimal = new Wolf(world, newPos);
             } else if (this instanceof Sheep) {
+                world.logs.add("Sheep spawned at X: " + newPos.second + " Y: " + newPos.first);
                 newAnimal = new Sheep(world, newPos);
             } else if (this instanceof Fox) {
+                world.logs.add("Fox spawned at X: " + newPos.second + " Y: " + newPos.first);
                 newAnimal = new Fox(world, newPos);
             } else if (this instanceof Turtle) {
+                world.logs.add("Turtle spawned at X: " + newPos.second + " Y: " + newPos.first);
                 newAnimal = new Turtle(world, newPos);
             } else if (this instanceof Antelope) {
+                world.logs.add("Antelopte spawned at X: " + newPos.second + " Y: " + newPos.first);
                 newAnimal = new Antelope(world, newPos);
             }
 
@@ -106,11 +111,14 @@ public abstract class Animal extends Organism {
                 return;
             }
 
+            world.logs.add(getType() + " ate " + organism.getType() + " at X: " + pos.first + " Y: " + pos.second);
+
             world.board[afterPos.second][afterPos.first] = null;
             world.removeOrganism(organism);
 
             move(afterPos);
         } else if (strength < organism.getStrength()) {
+            world.logs.add(getType() + " was eaten by " + organism.getType() + " at X: " + pos.first + " Y: " + pos.second);
 
             world.board[pos.second][pos.first] = null;
             world.removeOrganism(this);

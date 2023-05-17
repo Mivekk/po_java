@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class World {
+    private final int TILE_SIZE = 30;
+
+    private final int MAX_LOGS = 30;
+
     private final int ABILITY_COOLDOWN = 5;
 
     private final int ABILITY_DURATION = 5;
@@ -20,6 +24,8 @@ public class World {
     private final int sizeX, sizeY;
 
     private JFrame window = new JFrame("Virtual World Simulator");
+
+    private JTextArea logsTextArea = new JTextArea();
 
     private Human human = null;
 
@@ -32,6 +38,8 @@ public class World {
 
         init();
     }
+
+    public ArrayList<String> logs = new ArrayList<>();
 
     public ArrayList<Organism> organisms = new ArrayList<>();
 
@@ -51,30 +59,54 @@ public class World {
 
         Turtle turtle = new Turtle(this, new Pair<>(0, 15));
         organisms.add(turtle);
-//
-//        Sheep sheep = new Sheep(this, new Pair<>(6, 4));
-//        organisms.add(sheep);
-//
-//        Antelope antelope = new Antelope(this, new Pair<>(3, 8));
-//        organisms.add(antelope);
-//
-//        Fox fox = new Fox(this, new Pair<>(10, 9));
-//        organisms.add(fox);
 
-//        Belladonna belladonna = new Belladonna(this, new Pair<>(5, 4));
-//        organisms.add(belladonna);
-//
-//        Dandelion dandelion = new Dandelion(this, new Pair<>(6, 6));
-//        organisms.add(dandelion);
-//
-//        Guarana guarana = new Guarana(this, new Pair<>(6, 4));
-//        organisms.add(guarana);
-//
-//        Grass grass = new Grass(this, new Pair<>(3, 8));
-//        organisms.add(grass);
-//
-//        Sosnowsky sosnowsky = new Sosnowsky(this, new Pair<>(10, 9));
-//        organisms.add(sosnowsky);
+        Sheep sheep = new Sheep(this, new Pair<>(6, 4));
+        organisms.add(sheep);
+
+        Antelope antelope = new Antelope(this, new Pair<>(3, 8));
+        organisms.add(antelope);
+
+        Fox fox = new Fox(this, new Pair<>(10, 9));
+        organisms.add(fox);
+
+        Belladonna belladonna = new Belladonna(this, new Pair<>(7, 4));
+        organisms.add(belladonna);
+
+        Belladonna belladonna2 = new Belladonna(this, new Pair<>(7, 3));
+        organisms.add(belladonna2);
+
+        Dandelion dandelion = new Dandelion(this, new Pair<>(8, 6));
+        organisms.add(dandelion);
+
+        Guarana guarana = new Guarana(this, new Pair<>(8, 4));
+        organisms.add(guarana);
+
+        Grass grass = new Grass(this, new Pair<>(5, 8));
+        organisms.add(grass);
+
+        Sosnowsky sosnowsky = new Sosnowsky(this, new Pair<>(12, 9));
+        organisms.add(sosnowsky);
+    }
+
+    public void initLogs() {
+        JPanel logsPanel = new JPanel();
+        logsPanel.setBounds(sizeX * TILE_SIZE + TILE_SIZE, 0, 400, 600);
+
+        logsTextArea.setEditable(false);
+        logsTextArea.setFont(new Font("Arial", Font.PLAIN, 18));
+
+        logsPanel.add(logsTextArea);
+        window.add(logsPanel);
+    }
+
+    public void showLogs() {
+        logsTextArea.setText("");
+
+        for (int i = 0; i < logs.size(); i++) {
+            logsTextArea.append(logs.get(i) + "\n");
+        }
+
+        logs.clear();
     }
 
     public void addOrganism(Organism organism) {
@@ -102,9 +134,9 @@ public class World {
         initOrganisms();
 
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        window.setLayout(new GridBagLayout());
+        window.setLayout(null);
         window.setFocusable(true);
-        window.setSize(800, 800);
+        window.setSize(1000, 1000);
         window.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -123,6 +155,8 @@ public class World {
 
         initBoard();
 
+        initLogs();
+
         draw();
 
         handleInput();
@@ -131,25 +165,83 @@ public class World {
     }
 
     private void initBoard() {
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 0;
+        JPanel boardPanel = new JPanel(new GridLayout(sizeY, sizeX));
+        boardPanel.setBounds(0, 0, sizeY * TILE_SIZE, sizeX * TILE_SIZE);
 
         for (int i = 0; i < sizeY; i++) {
             for (int j = 0; j < sizeX; j++) {
                 JButton tileButton = new JButton();
                 tileButton.setFocusable(false);
                 tileButton.setBackground(Color.WHITE);
-                tileButton.setPreferredSize(new Dimension(27, 27));
-                window.add(tileButton, constraints);
+
+                final int tmpI = i;
+                final int tmpJ = j;
+
+                tileButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String[] organismsNames = {
+                                "Antelope", "Fox", "Sheep", "Turtle",
+                                "Wolf", "Belladonna", "Dandelion", "Grass",
+                                "Guarana", "Sosnowsky"
+                        };
+
+                        int selectedOrganism = JOptionPane.showOptionDialog(
+                                window,
+                                "Select an organism:",
+                                    "Organisms",
+                                JOptionPane.DEFAULT_OPTION,
+                                JOptionPane.INFORMATION_MESSAGE,
+                                null,
+                                organismsNames,
+                                organismsNames[0]
+                        );
+
+                        if (selectedOrganism != JOptionPane.CLOSED_OPTION) {
+                            if (organismsNames[selectedOrganism].equals("Wolf")) {
+                                Wolf newWolf = new Wolf(World.this, new Pair<>(tmpJ, tmpI));
+                                organisms.add(newWolf);
+                            } else if (organismsNames[selectedOrganism].equals("Sheep")) {
+                                Sheep newSheep = new Sheep(World.this, new Pair<>(tmpJ, tmpI));
+                                organisms.add(newSheep);
+                            } else if (organismsNames[selectedOrganism].equals("Fox")) {
+                                Fox newFox = new Fox(World.this, new Pair<>(tmpJ, tmpI));
+                                organisms.add(newFox);
+                            } else if (organismsNames[selectedOrganism].equals("Turtle")) {
+                                Turtle newTurtle = new Turtle(World.this, new Pair<>(tmpJ, tmpI));
+                                organisms.add(newTurtle);
+                            } else if (organismsNames[selectedOrganism].equals("Antelope")) {
+                                Antelope newAntelope = new Antelope(World.this, new Pair<>(tmpJ, tmpI));
+                                organisms.add(newAntelope);
+                            } else if (organismsNames[selectedOrganism].equals("Grass")) {
+                                Grass newGrass = new Grass(World.this, new Pair<>(tmpJ, tmpI));
+                                organisms.add(newGrass);
+                            } else if (organismsNames[selectedOrganism].equals("Dandelion")) {
+                                Dandelion newDandelion = new Dandelion(World.this, new Pair<>(tmpJ, tmpI));
+                                organisms.add(newDandelion);
+                            } else if (organismsNames[selectedOrganism].equals("Guarana")) {
+                                Guarana newGuarana = new Guarana(World.this, new Pair<>(tmpJ, tmpI));
+                                organisms.add(newGuarana);
+                            } else if (organismsNames[selectedOrganism].equals("Belladonna")) {
+                                Belladonna newBelladonna = new Belladonna(World.this, new Pair<>(tmpJ, tmpI));
+                                organisms.add(newBelladonna);
+                            } else if (organismsNames[selectedOrganism].equals("Sosnowsky")) {
+                                Sosnowsky newSosnowsky = new Sosnowsky(World.this, new Pair<>(tmpJ, tmpI));
+                                organisms.add(newSosnowsky);
+                            }
+                        }
+
+                        draw();
+                    }
+                });
+
+                boardPanel.add(tileButton);
 
                 tileButtons[i][j] = tileButton;
-
-                constraints.gridx++;
             }
-            constraints.gridx = 0;
-            constraints.gridy++;
         }
+
+        window.add(boardPanel);
     }
 
     private void run() {
@@ -167,7 +259,9 @@ public class World {
                 run();
             }
         });
-        window.add(nextTurnButton);
+        JPanel buttonsPanel = new JPanel(new GridLayout(1, 3));
+        buttonsPanel.setBounds(0, sizeY * TILE_SIZE, 400, 50);
+        buttonsPanel.add(nextTurnButton);
 
         JButton saveButton = new JButton("Save button");
         saveButton.setFocusable(false);
@@ -177,7 +271,7 @@ public class World {
                 save();
             }
         });
-        window.add(saveButton);
+        buttonsPanel.add(saveButton);
 
         JButton loadButton = new JButton("Load button");
         loadButton.setFocusable(false);
@@ -187,7 +281,9 @@ public class World {
                 load();
             }
         });
-        window.add(loadButton);
+        buttonsPanel.add(loadButton);
+
+        window.add(buttonsPanel);
 
         return false;
     }
@@ -228,6 +324,8 @@ public class World {
                 }
             }
         }
+
+        showLogs();
     }
 
 

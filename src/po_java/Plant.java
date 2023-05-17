@@ -34,14 +34,19 @@ public abstract class Plant extends Organism {
             Plant newPlant;
 
             if (this instanceof Grass) {
+                world.logs.add("Grass grew at X: " + newPos.second + " Y: " + newPos.first);
                 newPlant = new Grass(world, newPos);
             } else if (this instanceof Dandelion) {
+                world.logs.add("Dandelion grew at X: " + newPos.second + " Y: " + newPos.first);
                 newPlant = new Dandelion(world, newPos);
             } else if (this instanceof Guarana) {
+                world.logs.add("Guarana grew at X: " + newPos.second + " Y: " + newPos.first);
                 newPlant = new Guarana(world, newPos);
             } else if (this instanceof Belladonna) {
+                world.logs.add("Belladonna grew at X: " + newPos.second + " Y: " + newPos.first);
                 newPlant = new Belladonna(world, newPos);
             } else if (this instanceof Sosnowsky) {
+                world.logs.add("Sosnowsky grew at X: " + newPos.second + " Y: " + newPos.first);
                 newPlant = new Sosnowsky(world, newPos);
             } else {
                 return;

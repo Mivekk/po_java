@@ -20,6 +20,8 @@ public class Belladonna extends Plant {
         world.board[other.getPos().second][other.getPos().first] = null;
         world.removeOrganism(other);
 
+        other.setPos(new Pair<>(-1, -1));
+
         world.board[pos.second][pos.first] = null;
         world.removeOrganism(this);
     }
