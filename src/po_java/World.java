@@ -5,9 +5,8 @@ import po_java.plants.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -41,26 +40,26 @@ public class World {
     public JButton[][] tileButtons;
 
     private void initOrganisms() {
-        human = new Human(this, new Pair<>(2, 2));
+        human = new Human(this, new Pair<>(0, 0));
         organisms.add(human);
 
-        Wolf wolf = new Wolf(this, new Pair<>(5, 4));
+        Wolf wolf = new Wolf(this, new Pair<>(0, 9));
         organisms.add(wolf);
 
-        Wolf wolf2 = new Wolf(this, new Pair<>(5, 5));
+        Wolf wolf2 = new Wolf(this, new Pair<>(0, 12));
         organisms.add(wolf2);
 
-        Turtle turtle = new Turtle(this, new Pair<>(6, 6));
+        Turtle turtle = new Turtle(this, new Pair<>(0, 15));
         organisms.add(turtle);
-
-        Sheep sheep = new Sheep(this, new Pair<>(6, 4));
-        organisms.add(sheep);
-
-        Antelope antelope = new Antelope(this, new Pair<>(3, 8));
-        organisms.add(antelope);
-
-        Fox fox = new Fox(this, new Pair<>(10, 9));
-        organisms.add(fox);
+//
+//        Sheep sheep = new Sheep(this, new Pair<>(6, 4));
+//        organisms.add(sheep);
+//
+//        Antelope antelope = new Antelope(this, new Pair<>(3, 8));
+//        organisms.add(antelope);
+//
+//        Fox fox = new Fox(this, new Pair<>(10, 9));
+//        organisms.add(fox);
 
 //        Belladonna belladonna = new Belladonna(this, new Pair<>(5, 4));
 //        organisms.add(belladonna);
@@ -111,9 +110,11 @@ public class World {
             public void keyPressed(KeyEvent e) {
                 if (human != null) {
                     human.setNextMove(e.getKeyCode());
-                } else if (human != null && !human.abilityActivated && human.abilityCooldown < 0) {
-                    //human.abilityActivated = true;
-                    //human.abilityDuration = ABILITY_DURATION;
+
+                    if (e.getKeyCode() == 80 && !human.abilityActivated && human.abilityCooldown < 0) {
+                        human.abilityActivated = true;
+                        human.abilityDuration = ABILITY_DURATION;
+                    }
                 }
 
                 run();
@@ -123,6 +124,8 @@ public class World {
         initBoard();
 
         draw();
+
+        handleInput();
 
         window.setVisible(true);
     }
@@ -135,6 +138,7 @@ public class World {
         for (int i = 0; i < sizeY; i++) {
             for (int j = 0; j < sizeX; j++) {
                 JButton tileButton = new JButton();
+                tileButton.setFocusable(false);
                 tileButton.setBackground(Color.WHITE);
                 tileButton.setPreferredSize(new Dimension(27, 27));
                 window.add(tileButton, constraints);
@@ -154,7 +158,36 @@ public class World {
         draw();
     }
 
-    private boolean readInput() {
+    private boolean handleInput() {
+        JButton nextTurnButton = new JButton("Next turn");
+        nextTurnButton.setFocusable(false);
+        nextTurnButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                run();
+            }
+        });
+        window.add(nextTurnButton);
+
+        JButton saveButton = new JButton("Save button");
+        saveButton.setFocusable(false);
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                save();
+            }
+        });
+        window.add(saveButton);
+
+        JButton loadButton = new JButton("Load button");
+        loadButton.setFocusable(false);
+        loadButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                load();
+            }
+        });
+        window.add(loadButton);
 
         return false;
     }
@@ -207,10 +240,108 @@ public class World {
     }
 
     private void save() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("save.txt"))) {
+            writer.write(organisms.size() + " " + organismsSize + "\n");
 
+            for (int i = 0; i < organisms.size(); i++) {
+                Organism organism = organisms.get(i);
+                writer.write(organism.getStrength() + " " + organism.getAge() +
+                        " " + organism.getPos().first + " " + organism.getPos().second +
+                        " " + organism.getType() + " ");
+
+                if (organism.getType().equals("Human")) {
+                    writer.write(human.abilityActivated + " " + human.abilityCooldown +
+                            " " + human.abilityDuration);
+                }
+
+                writer.write("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void load() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("save.txt"))) {
+            organisms.clear();
+            board = new Organism[sizeY][sizeX];
 
+            int oSize;
+            String line = reader.readLine();
+            String[] sizeTokens = line.split(" ");
+            oSize = Integer.parseInt(sizeTokens[0]);
+            organismsSize = Integer.parseInt(sizeTokens[1]);
+
+            ArrayList<Organism> newOrganisms = new ArrayList<>();
+
+            for (int i = 0; i < oSize; i++) {
+                int tmpStrength, tmpAge;
+                Pair<Integer, Integer> tmpPos;
+                String tmpType;
+
+                line = reader.readLine();
+                String[] tokens = line.split(" ");
+                tmpStrength = Integer.parseInt(tokens[0]);
+                tmpAge = Integer.parseInt(tokens[1]);
+                int posX = Integer.parseInt(tokens[2]);
+                int posY = Integer.parseInt(tokens[3]);
+                tmpPos = new Pair<>(posX, posY);
+                tmpType = tokens[4];
+
+                Organism organism = null;
+                switch (tmpType) {
+                    case "Antelope":
+                        organism = new Antelope(this, tmpPos);
+                        break;
+                    case "Fox":
+                        organism = new Fox(this, tmpPos);
+                        break;
+                    case "Sheep":
+                        organism = new Sheep(this, tmpPos);
+                        break;
+                    case "Turtle":
+                        organism = new Turtle(this, tmpPos);
+                        break;
+                    case "Human":
+                        human = new Human(this, tmpPos);
+                        human.abilityActivated = Boolean.parseBoolean(tokens[5]);
+                        human.abilityCooldown = Integer.parseInt(tokens[6]);
+                        human.abilityDuration = Integer.parseInt(tokens[7]);
+                        organism = human;
+                        break;
+                    case "Wolf":
+                        organism = new Wolf(this, tmpPos);
+                        break;
+                    case "Belladonna":
+                        organism = new Belladonna(this, tmpPos);
+                        break;
+                    case "Dandelion":
+                        organism = new Dandelion(this, tmpPos);
+                        break;
+                    case "Grass":
+                        organism = new Grass(this, tmpPos);
+                        break;
+                    case "Guarana":
+                        organism = new Guarana(this, tmpPos);
+                        break;
+                    case "Sosnowsky":
+                        organism = new Sosnowsky(this, tmpPos);
+                        break;
+                }
+
+                if (organism != null) {
+                    organism.setStrength(tmpStrength);
+                    organism.setAge(tmpAge);
+                    newOrganisms.add(organism);
+                    board[tmpPos.second][tmpPos.first] = organism;
+                }
+            }
+
+            organisms = newOrganisms;
+
+            draw();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

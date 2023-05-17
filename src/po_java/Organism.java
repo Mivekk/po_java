@@ -59,7 +59,7 @@ public abstract class Organism {
                 afterPos.second < 0) {
 
             afterPos.second = pos.second - randomDirection.second;
-            if (afterPos.second >= world.board[0].length ||
+            if (afterPos.second >= world.board.length ||
                     afterPos.second < 0) {
                 afterPos = pos;
             }

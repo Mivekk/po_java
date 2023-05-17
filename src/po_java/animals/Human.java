@@ -19,10 +19,7 @@ public class Human extends Animal {
 
     public Human(World world, Pair<Integer, Integer> pos) {
         super(world, pos);
-        abilityCooldown = -1;
-        abilityDuration = -1;
-        abilityActivated = false;
-        nextMove = 0;
+
         strength = 5;
         initiative = 4;
     }
@@ -31,9 +28,9 @@ public class Human extends Animal {
         nextMove = arrowCode;
     }
 
-    public int abilityCooldown;
-    public int abilityDuration;
-    public boolean abilityActivated;
+    public int abilityCooldown = -1;
+    public int abilityDuration = -1;
+    public boolean abilityActivated = false;
 
     @Override
     public Pair<Integer, Integer> getNextPos() {
@@ -68,6 +65,8 @@ public class Human extends Animal {
                     afterPos.first--;
                 }
                 break;
+            default:
+                return pos;
         }
 
         nextMove = 0;
@@ -106,5 +105,5 @@ public class Human extends Animal {
         return false;
     }
 
-    private int nextMove;
+    private int nextMove = 0;
 }
